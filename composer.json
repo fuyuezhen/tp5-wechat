@@ -13,12 +13,12 @@
     },
     "autoload": {
         "psr-4": {
-            "fuyuezhen\\" : "src/"
+            "fuyuezhen\\wxuser\\" : "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "fuyuezhen\\test\\" : "test/"
+            "fuyuezhen\\wxuser\\test\\" : "test/"
         }
     }
 }
