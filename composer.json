@@ -1,0 +1,24 @@
+{
+    "name": "fyz/wxuser",
+    "description": "获取微信用户信息",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fuyuezhen",
+            "email": "976066889@qq.com"
+        }
+    ],
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "fuyuezhen\\" : "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "fuyuezhen\\test\\" : "test/"
+        }
+    }
+}
