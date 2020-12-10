@@ -1,8 +1,9 @@
 <?php
-namespace fuyuezhen\wxuser;
+namespace fuyuezhen\wechat;
 
-use fuyuezhen\wxuser\util\Cached;
-use fuyuezhen\wxuser\config\UrlConfig;
+use fuyuezhen\wechat\util\Cached;
+use fuyuezhen\wechat\util\Request;
+use fuyuezhen\wechat\config\UrlConfig;
 
 /** 
 * 微信登录
@@ -19,17 +20,18 @@ class Oauth
     private $scope = 'snsapi_base'; 
     // 微信登陆code
     private $code  = ''; 
+    // 获取用户信息：0基础用户信息，1只获取OpenId
+    private $userinfo_type  = 0; 
 
     /** 
     * 构造函数
-    * @author 小镇 <976066889@qq.com>
-    * @param string $appid 开发者ID
+    * @param string $appid   开发者ID
     * @param string $secret 开发者密钥
-    * @param string $scope 登陆方式
-    * @created 2020-12-09
+    * @param string $scope  登陆方式
+    * @param string $userinfo_type 获取用户信息
     * @return void
     */ 
-    public function __construct($appid = '', $secret = '', $scope = '')
+    public function __construct($appid = '', $secret = '', $scope = '', $userinfo_type = '')
     {
         if (!empty($appid)) {
             $this->appid   = $appid;
@@ -40,6 +42,12 @@ class Oauth
         if (!empty($scope)) {
             $this->scope   = $scope;
         }
+        if (!empty($userinfo_type)) {
+            $this->userinfo_type   = $userinfo_type;
+        }
+
+        // 设置appid缓存
+        Cached::setAppid($this->appid);
     }
 
     /**
@@ -50,8 +58,15 @@ class Oauth
     {
         // 获取code
         $this->getCode();
-        
-        echo $this->code;
+        // 获取openid
+        $this->getOpenId();
+        // 获取用户信息
+        if (empty($this->userinfo_type)) {
+            $userinfo = $this->getUserInfo();
+        } else {
+            $userinfo['openid'] = $this->openid;
+        }
+        return $userinfo;
     }
 
     /**
@@ -64,9 +79,10 @@ class Oauth
         $this->code  = request()->param('code', '');
         // 因为回调url只能放一个参数，所以用state存放参数，最后在格式化处理
         $this->state = request()->param('state', '');
-        // $oldcode = Cached::getCode(); // code 缓存
+        // code 缓存
+        $oldcode = Cached::getCode(); 
         // 如果当前code 是失效的code,就会重新获取
-        if(empty($this->code)){
+        if(empty($this->code) || (!empty($oldcode) && $oldcode == $this->code)){
             $options = [
                 'appid'         => $this->appid,
                 'redirect_uri'  => request()->baseUrl(true),
@@ -78,11 +94,71 @@ class Oauth
             header('Location:' . $url);
             exit;
         }
-        request()->withGet(['test222' => $this->state]);
-
-        echo request()->get('test222');
-        // echo $this->state;
-        echo "<br>";
         return $this->code;
+    }
+
+    /**
+     * 获取用户OpenId
+     * @return void
+     */
+    public function getOpenId()
+    {        
+        // 获取OpenId 与 token
+        $options = [ 
+            'appid'  => $this->appid, 
+            'secret' => $this->secret, 
+            'code'   => $this->code, 
+            'grant_type'=>'authorization_code' 
+        ];
+        $url    = UrlConfig::OAUTH_GETTOKEN_URL . http_build_query($options);
+        $result = Request::curl($url);
+
+        // 设置code 缓存
+        Cached::setCode($this->code);
+        if(isset($result['errcode'])){
+            // 登陆失败
+            $this->jsAlert(json_encode($result));
+        }
+        $this->access_token = $result['access_token'];
+        $this->openid       = $result['openid'];
+        return $result;
+    }
+
+    /**
+     * 获取用户信息
+     * @return void
+     */
+    public function getUserInfo()
+    {
+        $options = [
+            'access_token'  => $this->access_token,
+            'openid'        => $this->openid,
+            'lang'=>'zh_CN'
+        ];
+
+        $url    = UrlConfig::SNSAPI_USERINFO_URL . http_build_query($options);
+        $result = Request::curl($url);
+        if(isset($result['errcode'])){
+            $this->jsAlert(\json_encode($result));
+        }
+        return $result;
+    }
+
+    /**
+     * js弹窗
+     * @param string $msg
+     * @return void
+     */
+    function jsAlert($msg = '')
+    {
+        echo "<script>window.alert = function(name){
+            var iframe = document.createElement('IFRAME');
+            iframe.style.display='none';
+            iframe.setAttribute('src', 'data:text/plain,');
+            document.documentElement.appendChild(iframe);
+            window.frames[0].window.alert(name);
+            iframe.parentNode.removeChild(iframe);
+        };alert('".$msg."');</script>";
+        exit;
     }
 }

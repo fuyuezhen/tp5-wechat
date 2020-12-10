@@ -1,5 +1,5 @@
 <?php
-namespace fuyuezhen\wxuser\config;
+namespace fuyuezhen\wechat\config;
 /** 
 * 微信接口地址
 * @author fuyuezhen <976066889@qq.com>

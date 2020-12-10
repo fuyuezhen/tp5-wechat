@@ -1,5 +1,7 @@
 <?php
-namespace fuyuezhen\wxuser\util;
+namespace fuyuezhen\wechat\util;
+
+use Session;
 
 /** 
 * 缓存类
@@ -8,6 +10,9 @@ namespace fuyuezhen\wxuser\util;
 */ 
 class Cached
 {
+    // 缓存公众号appid，用于缓存key
+    const MP_APPID_SESSION     = "MP_APPID_SESSION";
+
     // 微信code 凭证 缓存，防止code失效后刷新页面出错
     const OAUTH_CODE_SESSION     = "OAUTH_CODE_SESSION";
 
@@ -64,7 +69,7 @@ class Cached
      */
     public static function getSession($key)
     {
-        return Session::get($key.$this->appid);
+        return Session::get($key.self::getAppid());
     }
     /**
      * 设置Session缓存
@@ -74,6 +79,29 @@ class Cached
      */
     public static function setSession($key, $value)
     {
-        return Session::set($key.$this->appid, $value);
+        return Session::set($key.self::getAppid(), $value);
+    }
+
+    /**
+     * ============================================================ 缓存 开发者ID ===========================================================
+     */
+
+    /**
+     * 获取appid缓存
+     * @return string
+     */
+    public static function getAppid()
+    {
+        return Session::get(self::MP_APPID_SESSION);
+    }
+
+    /**
+     * 设置appid缓存
+     * @param string $value 开发者ID
+     * @return void
+     */
+    public static function setAppid($value)
+    {
+        return Session::set(self::MP_APPID_SESSION, $value);
     }
 }
