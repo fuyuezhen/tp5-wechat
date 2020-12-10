@@ -1,6 +1,6 @@
 {
-    "name": "fuyuezhen/wxuser",
-    "description": "获取微信用户信息",
+    "name": "fuyuezhen/tp5-wechat",
+    "description": "微信api",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -13,12 +13,12 @@
     },
     "autoload": {
         "psr-4": {
-            "fuyuezhen\\wxuser\\" : "src/"
+            "fuyuezhen\\wechat\\" : "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "fuyuezhen\\wxuser\\test\\" : "test/"
+            "fuyuezhen\\wechat\\test\\" : "test/"
         }
     }
 }
