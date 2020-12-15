@@ -1,5 +1,7 @@
 <?php
-namespace fuyuezhen\wxuser\util;
+namespace fuyuezhen\wechat\util;
+
+use Session;
 
 /** 
 * 缓存类
@@ -8,31 +10,9 @@ namespace fuyuezhen\wxuser\util;
 */ 
 class Cached
 {
+
     // 微信code 凭证 缓存，防止code失效后刷新页面出错
     const OAUTH_CODE_SESSION     = "OAUTH_CODE_SESSION";
-
-    // 微信信息 缓存
-    const WECHAT_SESSION_SESSION = "WECHAT_SESSION_SESSION";
-
-    /**
-     * ============================================================ 微信信息 ===========================================================
-     */
-    /**
-     * 设置微信信息缓存
-     * @param string $value 缓存内容
-     * @return void
-     */
-    public static function setSessionInfo($value){
-        self::setSession(self::WECHAT_SESSION_SESSION, $value);
-    }
-
-    /**
-     * 获取微信信息缓存
-     * @return array
-     */
-    public static function getSessionInfo(){
-        return self::getSession(self::WECHAT_SESSION_SESSION);
-    }
 
     /**
      * ============================================================ 微信登陆 code ===========================================================
@@ -64,7 +44,7 @@ class Cached
      */
     public static function getSession($key)
     {
-        return Session::get($key.$this->appid);
+        return Session::get($key);
     }
     /**
      * 设置Session缓存
@@ -74,6 +54,7 @@ class Cached
      */
     public static function setSession($key, $value)
     {
-        return Session::set($key.$this->appid, $value);
+        return Session::set($key, $value);
     }
+
 }
