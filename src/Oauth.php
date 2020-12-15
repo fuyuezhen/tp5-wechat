@@ -45,9 +45,6 @@ class Oauth
         if (!empty($userinfo_type)) {
             $this->userinfo_type   = $userinfo_type;
         }
-
-        // 设置appid缓存
-        Cached::setAppid($this->appid);
     }
 
     /**
@@ -66,6 +63,9 @@ class Oauth
         } else {
             $userinfo['openid'] = $this->openid;
         }
+        // 清除code缓存
+        // Cached::setCode(null);
+
         return $userinfo;
     }
 
@@ -82,7 +82,7 @@ class Oauth
         // code 缓存
         $oldcode = Cached::getCode(); 
         // 如果当前code 是失效的code,就会重新获取
-        if(empty($this->code) || (!empty($oldcode) && $oldcode == $this->code)){
+        if (empty($this->code) || (!empty($oldcode) && $oldcode == $this->code)) {
             $options = [
                 'appid'         => $this->appid,
                 'redirect_uri'  => request()->baseUrl(true),
@@ -112,7 +112,6 @@ class Oauth
         ];
         $url    = UrlConfig::OAUTH_GETTOKEN_URL . http_build_query($options);
         $result = Request::curl($url);
-
         // 设置code 缓存
         Cached::setCode($this->code);
         if(isset($result['errcode'])){

@@ -10,34 +10,9 @@ use Session;
 */ 
 class Cached
 {
-    // 缓存公众号appid，用于缓存key
-    const MP_APPID_SESSION     = "MP_APPID_SESSION";
 
     // 微信code 凭证 缓存，防止code失效后刷新页面出错
     const OAUTH_CODE_SESSION     = "OAUTH_CODE_SESSION";
-
-    // 微信信息 缓存
-    const WECHAT_SESSION_SESSION = "WECHAT_SESSION_SESSION";
-
-    /**
-     * ============================================================ 微信信息 ===========================================================
-     */
-    /**
-     * 设置微信信息缓存
-     * @param string $value 缓存内容
-     * @return void
-     */
-    public static function setSessionInfo($value){
-        self::setSession(self::WECHAT_SESSION_SESSION, $value);
-    }
-
-    /**
-     * 获取微信信息缓存
-     * @return array
-     */
-    public static function getSessionInfo(){
-        return self::getSession(self::WECHAT_SESSION_SESSION);
-    }
 
     /**
      * ============================================================ 微信登陆 code ===========================================================
@@ -69,7 +44,7 @@ class Cached
      */
     public static function getSession($key)
     {
-        return Session::get($key.self::getAppid());
+        return Session::get($key);
     }
     /**
      * 设置Session缓存
@@ -79,29 +54,7 @@ class Cached
      */
     public static function setSession($key, $value)
     {
-        return Session::set($key.self::getAppid(), $value);
+        return Session::set($key, $value);
     }
 
-    /**
-     * ============================================================ 缓存 开发者ID ===========================================================
-     */
-
-    /**
-     * 获取appid缓存
-     * @return string
-     */
-    public static function getAppid()
-    {
-        return Session::get(self::MP_APPID_SESSION);
-    }
-
-    /**
-     * 设置appid缓存
-     * @param string $value 开发者ID
-     * @return void
-     */
-    public static function setAppid($value)
-    {
-        return Session::set(self::MP_APPID_SESSION, $value);
-    }
 }
