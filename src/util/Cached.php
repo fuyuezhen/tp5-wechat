@@ -22,16 +22,16 @@ class Cached
      * @param string $value 缓存内容
      * @return void
      */
-    public static function setCode($value){
-        self::setSession(self::OAUTH_CODE_SESSION, $value);
+    public static function setCode($value, $appid){
+        self::setSession(self::OAUTH_CODE_SESSION.$appid, $value);
     }
 
     /**
      * 获取微信 code 凭证缓存
      * @return string
      */
-    public static function getCode(){
-        return self::getSession(self::OAUTH_CODE_SESSION);
+    public static function getCode($appid){
+        return self::getSession(self::OAUTH_CODE_SESSION.$appid);
     }
 
     /**
