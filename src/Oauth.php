@@ -58,7 +58,7 @@ class Oauth
         // 获取openid
         $this->getOpenId();
         // 获取用户信息
-        if (empty($this->userinfo_type)) {
+        if (empty($this->userinfo_type) && $this->scope == "snsapi_userinfo") {
             $userinfo = $this->getUserInfo();
         } else {
             $userinfo['openid'] = $this->openid;
@@ -80,7 +80,7 @@ class Oauth
         // 因为回调url只能放一个参数，所以用state存放参数，最后在格式化处理
         $this->state = request()->param('state', '');
         // code 缓存
-        $oldcode = Cached::getCode(); 
+        $oldcode = Cached::getCode($this->appid); 
         // 如果当前code 是失效的code,就会重新获取
         if (empty($this->code) || (!empty($oldcode) && $oldcode == $this->code)) {
             $options = [
@@ -113,7 +113,7 @@ class Oauth
         $url    = UrlConfig::OAUTH_GETTOKEN_URL . http_build_query($options);
         $result = Request::curl($url);
         // 设置code 缓存
-        Cached::setCode($this->code);
+        Cached::setCode($this->code, $this->appid);
         if(isset($result['errcode'])){
             // 登陆失败
             $this->jsAlert(json_encode($result));
