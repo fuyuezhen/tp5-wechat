@@ -116,7 +116,10 @@ class Oauth
         Cached::setCode($this->code, $this->appid);
         if(isset($result['errcode'])){
             // 登陆失败
-            $this->jsAlert(json_encode($result));
+            $this->jsAlert(json_encode([
+                'errtype' => 2,
+                'result'  => $result
+            ]));
         }
         $this->access_token = $result['access_token'];
         $this->openid       = $result['openid'];
@@ -138,7 +141,10 @@ class Oauth
         $url    = UrlConfig::SNSAPI_USERINFO_URL . http_build_query($options);
         $result = Request::curl($url);
         if(isset($result['errcode'])){
-            $this->jsAlert(\json_encode($result));
+            $this->jsAlert(\json_encode([
+                'errtype' => 3,
+                'result'  => $result
+            ]));
         }
         return $result;
     }
